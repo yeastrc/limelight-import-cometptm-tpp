@@ -9,6 +9,7 @@ import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.S
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery.SearchResult.SearchHit;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery.SearchResult.SearchHit.AnalysisResult;
 import org.yeastrc.limelight.xml.cometptm_tpp.constants.MassConstants;
+import org.yeastrc.limelight.xml.cometptm_tpp.objects.CometPTMParameters;
 import org.yeastrc.limelight.xml.cometptm_tpp.objects.TPPPSM;
 
 import javax.xml.bind.JAXBContext;
@@ -200,7 +201,8 @@ public class TPPParsingUtils {
 			int charge,
 			int scanNumber,
 			BigDecimal obsMass,
-			BigDecimal retentionTime ) throws Throwable {
+			BigDecimal retentionTime,
+			CometPTMParameters params ) throws Throwable {
 				
 		TPPPSM psm = new TPPPSM();
 		
@@ -232,7 +234,7 @@ public class TPPParsingUtils {
 
 		
 		try {
-			psm.setModifications( getModificationsForSearchHit( searchHit ) );
+			psm.setModifications( getModificationsForSearchHit( searchHit, params ) );
 		} catch( Throwable t ) {
 			
 			System.err.println( "Error getting mods for PSM. Error was: " + t.getMessage() );
@@ -334,7 +336,7 @@ public class TPPParsingUtils {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit ) throws Throwable {
+	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit, CometPTMParameters params ) throws Throwable {
 		
 		Map<Integer, BigDecimal> modMap = new HashMap<>();
 
@@ -360,12 +362,32 @@ public class TPPParsingUtils {
 
 				modMass = modMass.setScale( 4, RoundingMode.HALF_UP );	// round the mod mass to 4 decimal places
 
-				modMap.put( position, modMass );
+				if( !isModStaticMod( aminoAcid, modMass, params ) ) {
+					modMap.put(position, modMass);
+				}
 			}
 		}
 		
 		return modMap;
 	}
+
+	private static boolean isModStaticMod(String aminoAcid, BigDecimal modMass, CometPTMParameters params ) {
+
+		if( params.getStaticMods() == null || params.getStaticMods().size() < 1 ) {
+			return false;
+		}
+
+		if( !params.getStaticMods().containsKey( aminoAcid.charAt( 0 ) ) ) {
+			return false;
+		}
+
+		// round to two decimal places and compare
+		BigDecimal testMass = modMass.setScale( 2, RoundingMode.HALF_UP );
+		BigDecimal paramMass = BigDecimal.valueOf( params.getStaticMods().get( aminoAcid.charAt( 0 ) ) ).setScale( 2, RoundingMode.HALF_UP );
+
+		return testMass.equals( paramMass );
+	}
+
 
 	/**
 	 * Get the mass diff reported for the search hit

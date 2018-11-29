@@ -23,7 +23,7 @@ public class XMLBuilder {
 
 	public void buildAndSaveXML( ConversionParameters conversionParameters,
 			                     TPPResults tppResults,
-			                     CometPTMParameters magnumParameters,
+			                     CometPTMParameters cometTPPParameters,
 			                     TPPErrorAnalysis ppErrorAnalysis,
 			                     TPPErrorAnalysis ipErrorAnalysis )
     throws Exception {
@@ -166,16 +166,16 @@ public class XMLBuilder {
 		//
 		// Define the static mods
 		//
-		if( magnumParameters.getStaticMods() != null && magnumParameters.getStaticMods().keySet().size() > 0 ) {
+		if( cometTPPParameters.getStaticMods() != null && cometTPPParameters.getStaticMods().keySet().size() > 0 ) {
 			StaticModifications smods = new StaticModifications();
 			limelightInputRoot.setStaticModifications( smods );
 			
 			
-			for( char residue : magnumParameters.getStaticMods().keySet() ) {
+			for( char residue : cometTPPParameters.getStaticMods().keySet() ) {
 				
 				StaticModification xmlSmod = new StaticModification();
 				xmlSmod.setAminoAcid( String.valueOf( residue ) );
-				xmlSmod.setMassChange( BigDecimal.valueOf( magnumParameters.getStaticMods().get( residue ) ) );
+				xmlSmod.setMassChange( BigDecimal.valueOf( cometTPPParameters.getStaticMods().get( residue ) ) );
 				
 				smods.getStaticModification().add( xmlSmod );
 			}
