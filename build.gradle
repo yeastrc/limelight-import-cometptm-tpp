@@ -55,12 +55,12 @@ processResources {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.yeastrc.limelight.xml.cometptm.main.MainProgram'
+        attributes 'Main-Class': 'org.yeastrc.limelight.xml.cometptm_tpp.main.MainProgram'
     }
 }
 
 shadowJar {
-    baseName = 'cometPTM2LimelightXML'
+    baseName = 'cometPTMTPP2LimelightXML'
     classifier = null
     version = null
 }
