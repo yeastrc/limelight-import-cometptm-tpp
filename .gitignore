@@ -24,3 +24,5 @@ hs_err_pid*
 /.idea/
 /deploy/
 /limelight-import-cometptm-tpp.iml
+/build/
+/.gradle/
